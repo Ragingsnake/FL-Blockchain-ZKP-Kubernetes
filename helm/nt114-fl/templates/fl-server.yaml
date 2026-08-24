@@ -38,6 +38,8 @@ spec:
               value: {{ .Values.contract.addressFile }}
             - name: FAULTY_CLIENTS
               value: {{ .Values.fl.faultyClients | quote }}
+            - name: ATTACK_MODE
+              value: {{ .Values.fl.attackMode | quote }}
             - name: HISTORY_DIR
               value: /results/history
             - name: RESULTS_DIR

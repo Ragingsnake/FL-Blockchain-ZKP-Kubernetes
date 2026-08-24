@@ -210,6 +210,7 @@ IMAGE_NAME="${IMAGE_NAME:-project-nt114}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 RESULTS_LOCAL_DIR="${RESULTS_LOCAL_DIR:-$ROOT_DIR/nt114-results}"
 FAULTY_CLIENTS="${FAULTY_CLIENTS:-}"
+ATTACK_MODE="${ATTACK_MODE:-}"
 CLEANUP_AFTER_RUN="${CLEANUP_AFTER_RUN:-true}"
 KEEP_RESOURCE_GROUP="${KEEP_RESOURCE_GROUP:-false}"
 
@@ -263,7 +264,10 @@ HELM_SET_ARGS=(
   --set-string "image.tag=$IMAGE_TAG"
 )
 if [[ -n "$FAULTY_CLIENTS" ]]; then
-  HELM_SET_ARGS+=(--set-string "faultyClients=$FAULTY_CLIENTS")
+  HELM_SET_ARGS+=(--set-string "fl.faultyClients=$FAULTY_CLIENTS")
+fi
+if [[ -n "$ATTACK_MODE" ]]; then
+  HELM_SET_ARGS+=(--set-string "fl.attackMode=$ATTACK_MODE")
 fi
 
 log "Deleting previous FL jobs to avoid immutable Job template upgrade errors"

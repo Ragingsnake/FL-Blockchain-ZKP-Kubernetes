@@ -72,10 +72,14 @@ class SecureFLStrategy(fl.server.strategy.FedAvg):
 
             start = time.time()
             verified = verify_proof(params, proof)
-            round_verify_times.append(time.time() - start)
+            verify_elapsed = time.time() - start
+            round_verify_times.append(verify_elapsed)
+
+            proof_type = proof.get("proof_type", "legacy_hash")
+            print(f"  🔐 Client {cid} ZKP [{proof_type}] → {'✅ PASS' if verified else '❌ FAIL'} ({verify_elapsed:.4f}s)")
 
             if not verified:
-                print(f"❌ ZKP FAILED for Client {cid}")
+                print(f"❌ zk-SNARK VERIFICATION FAILED for Client {cid}")
                 reputation_manager.update_reputation(cid, -1.0) 
                 # penalty_this_round.append(cid)
                 continue

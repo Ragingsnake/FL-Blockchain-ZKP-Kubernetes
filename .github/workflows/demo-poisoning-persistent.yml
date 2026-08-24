@@ -1,0 +1,22 @@
+name: Demo Poisoning Persistent Label-Flip
+
+on:
+  workflow_dispatch:
+
+concurrency: 
+  group: aks-demo
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-images.yml
+    secrets: inherit
+
+  demo:
+    needs: build
+    uses: ./.github/workflows/setup-aks.yml
+    with:
+      demo_name: "poisoning-label-flip"
+      faulty_clients: "3"
+      attack_mode: "label_flip"
+      keep_rg: "false"
+    secrets: inherit

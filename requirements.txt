@@ -3,3 +3,4 @@ ipfshttpclient
 matplotlib
 numpy
 web3
+py_ecc

@@ -12,3 +12,4 @@ data:
   CONTRACT_ADDRESS_FILE: {{ .Values.contract.addressFile }}
   SERVER_ADDRESS: fl-server:{{ .Values.fl.serverPort }}
   SPLIT_TYPE: {{ .Values.fl.splitType }}
+  ATTACK_MODE: {{ .Values.fl.attackMode | quote }}

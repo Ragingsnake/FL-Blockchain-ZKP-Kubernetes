@@ -47,6 +47,8 @@ spec:
               value: {{ $root.Values.contract.addressFile }}
             - name: FAULTY_CLIENTS
               value: {{ $root.Values.fl.faultyClients | quote }}
+            - name: ATTACK_MODE
+              value: {{ $root.Values.fl.attackMode | quote }}
             - name: RESULTS_DIR
               value: /results
           volumeMounts:

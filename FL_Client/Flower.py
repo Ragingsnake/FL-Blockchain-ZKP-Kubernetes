@@ -65,15 +65,24 @@ class FlowerClient(fl.client.NumPyClient):
             faulty_clients = [int(x) for x in faulty_env.split(",") if x.strip()]
 
         is_faulty = self.client_id in faulty_clients
+        attack_mode = os.getenv("ATTACK_MODE", "noise")
         
         if is_faulty:
-            print(f"⚠ Client {self.client_id} is FAULTY")
+            print(f"⚠ Client {self.client_id} is FAULTY (mode={attack_mode})")
             
         global_params = [torch.from_numpy(p).to(DEVICE) for p in parameters]
         
         global_params = [p.detach().clone().to(DEVICE) for p in global_params]
+
+        # Label-flipping attack: train on poisoned data
+        trainloader_override = None
+        if is_faulty and attack_mode == "label_flip":
+            from FL_Client.faulty import flip_labels
+            trainloader_override = flip_labels(self.trainloader, num_classes=62)
+            print(f"🔄 Client {self.client_id} using FLIPPED LABELS for training")
         
-        result = train(self.model, self.trainloader, global_params, self.criterion)
+        result = train(self.model, self.trainloader, global_params, self.criterion, 
+                       trainloader_override=trainloader_override)
         print(f"[Client {self.client_id}] Acc: {result['accuracy']:.4f} | Loss: {result['loss']:.4f}")
 
         os.makedirs("models/clients", exist_ok=True)
@@ -82,9 +91,11 @@ class FlowerClient(fl.client.NumPyClient):
 
         cid = upload_to_ipfs(model_path)
         params = self.get_parameters({})
-        if is_faulty:
+        if is_faulty and attack_mode != "label_flip":
             params = corrupt_parameters(params)
-            print("💣 Sent corrupted update")
+            print("💣 Sent corrupted update (noise injection)")
+        elif is_faulty and attack_mode == "label_flip":
+            print("🔄 Sent label-flipped model update (weights look normal, semantics poisoned)")
 
         proof = generate_proof(params)
         proof_str = json.dumps(proof)

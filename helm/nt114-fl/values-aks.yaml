@@ -12,6 +12,7 @@ fl:
   clientCount: 5
   splitType: non_iid
   faultyClients: ""
+  attackMode: ""
 
 plot:
   enabled: false

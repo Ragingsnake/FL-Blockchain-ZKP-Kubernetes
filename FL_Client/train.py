@@ -40,7 +40,9 @@ torch.set_num_interop_threads(4)
 #         "time": time.time() - start_time
 #     }
 
-def train(model, trainloader, global_params, criterion):
+def train(model, trainloader, global_params, criterion, trainloader_override=None):
+    if trainloader_override is not None:
+        trainloader = trainloader_override
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
     model.train()
 

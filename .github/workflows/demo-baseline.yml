@@ -1,0 +1,22 @@
+name: Demo Baseline
+
+on:
+  workflow_dispatch:
+
+concurrency: 
+  group: aks-demo
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-images.yml
+    secrets: inherit
+
+  demo:
+    needs: build
+    uses: ./.github/workflows/setup-aks.yml
+    with:
+      demo_name: "baseline"
+      faulty_clients: ""
+      attack_mode: ""
+      keep_rg: "false"
+    secrets: inherit

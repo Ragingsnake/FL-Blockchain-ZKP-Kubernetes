@@ -1,0 +1,32 @@
+name: Cleanup Azure
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_group:
+        type: string
+        default: ""
+        description: "Resource group to delete. Leave empty to use AZURE_RG secret."
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete Resource Group
+        shell: bash
+        env:
+          INPUT_RG: ${{ inputs.resource_group }}
+          SECRET_RG: ${{ secrets.AZURE_RG }}
+        run: |
+          RG="${INPUT_RG:-${SECRET_RG:-nt114-rg}}"
+          echo "Deleting Resource Group: $RG"
+          az group delete --name "$RG" --yes
+          echo "Successfully deleted resource group $RG"

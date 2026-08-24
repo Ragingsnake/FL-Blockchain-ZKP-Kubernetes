@@ -1,0 +1,22 @@
+name: Demo Poisoning Random Noise
+
+on:
+  workflow_dispatch:
+
+concurrency: 
+  group: aks-demo
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-images.yml
+    secrets: inherit
+
+  demo:
+    needs: build
+    uses: ./.github/workflows/setup-aks.yml
+    with:
+      demo_name: "poisoning-random-noise"
+      faulty_clients: "3,4"
+      attack_mode: "noise"
+      keep_rg: "false"
+    secrets: inherit

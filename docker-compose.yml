@@ -46,6 +46,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     ports:
@@ -65,6 +66,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     depends_on:
@@ -81,6 +83,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     depends_on:
@@ -97,6 +100,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     depends_on:
@@ -113,6 +117,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     depends_on:
@@ -129,6 +134,7 @@ services:
       IPFS_API_ADDR: /dns4/ipfs/tcp/5001/http
       CONTRACT_ADDRESS_FILE: /app/runtime/reputation-address.json
       FAULTY_CLIENTS: ${FAULTY_CLIENTS:-}
+      ATTACK_MODE: ${ATTACK_MODE:-}
     volumes:
       - .:/app
     depends_on:

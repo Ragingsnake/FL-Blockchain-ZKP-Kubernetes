@@ -1,0 +1,46 @@
+name: Build Images
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Ensure RG and ACR
+        shell: bash
+        env:
+          RG: ${{ secrets.AZURE_RG }}
+          LOCATION: ${{ secrets.AZURE_LOCATION }}
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+        run: |
+          RG="${RG:-nt114-rg}"
+          LOCATION="${LOCATION:-centralindia}"
+          echo "Creating Resource Group..."
+          az group create --name "$RG" --location "$LOCATION"
+          
+          echo "Checking ACR existence..."
+          if ! az acr show --name "$ACR_NAME" --resource-group "$RG" &>/dev/null; then
+            echo "Creating ACR..."
+            az acr create --name "$ACR_NAME" --resource-group "$RG" --sku Standard
+          else
+            echo "ACR already exists."
+          fi
+
+      - name: Build and Push Image
+        shell: bash
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+        run: |
+          echo "Building and pushing image to ACR..."
+          az acr build --registry "$ACR_NAME" --image project-nt114:latest .
+          echo "Image pushed: $ACR_NAME.azurecr.io/project-nt114:latest"

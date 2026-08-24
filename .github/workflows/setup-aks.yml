@@ -1,0 +1,73 @@
+name: Setup AKS and Run
+
+on:
+  workflow_call:
+    inputs:
+      faulty_clients:
+        type: string
+        default: ""
+        description: "Comma-separated client IDs to mark faulty"
+      attack_mode:
+        type: string
+        default: ""
+        description: "Attack mode: '' or 'noise' or 'label_flip'"
+      demo_name:
+        type: string
+        required: true
+        description: "Name for the demo run, used for artifact naming"
+      keep_rg:
+        type: string
+        default: "true"
+        description: "Whether to keep the resource group after run"
+
+jobs:
+  run-aks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Helm
+        shell: bash
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Run AKS Script
+        shell: bash
+        env:
+          RG: ${{ secrets.AZURE_RG }}
+          LOCATION: ${{ secrets.AZURE_LOCATION }}
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          FAULTY_CLIENTS: ${{ inputs.faulty_clients }}
+          ATTACK_MODE: ${{ inputs.attack_mode }}
+          KEEP_RESOURCE_GROUP: ${{ inputs.keep_rg }}
+          CLEANUP_AFTER_RUN: "false"
+          RESULTS_LOCAL_DIR: ${{ github.workspace }}/nt114-results
+        run: |
+          export RG="${RG:-nt114-rg}"
+          export LOCATION="${LOCATION:-centralindia}"
+          bash scripts/aks_cloudshell_run.sh
+          
+      - name: Generate Plots
+        if: always()
+        shell: bash
+        env:
+          RESULTS_DIR: ${{ github.workspace }}/nt114-results
+        run: |
+          pip install matplotlib numpy
+          python plot_results.py || echo "Plot generation skipped (no history files yet)"
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ inputs.demo_name }}
+          path: ${{ github.workspace }}/nt114-results/
+          if-no-files-found: warn
